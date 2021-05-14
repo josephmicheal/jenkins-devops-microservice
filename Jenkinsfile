@@ -13,6 +13,7 @@ pipeline {
 		stage('Build') {
 			steps{
 				sh 'mvn --version'
+				sh 'docker version'
 				echo "Build"
 				input 'This is input string'
 				echo 'Environment Variables'
