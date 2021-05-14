@@ -43,6 +43,37 @@ pipeline {
 				sh "mvn failsafe:integration-test failsafe:verify"
 			}
 		}
+
+		stage('Create JAR file as package') {
+			steps{
+				//test can be skipped as already ran
+				script{
+					sh "mvn package -DskipTests"
+				}
+			}
+		}
+
+		stage('Build Docker Image') {
+			steps{
+				//"docker build -t sunleo04/jenkins-devops-microservice:${env.BUILD_TAG}"
+				script{
+					dockerImage = docker.build("sunleo04/jenkins-devops-microservice:${env.BUILD_TAG}")
+				}
+			}
+		}
+		
+		stage('Push Docker Image') {
+			steps{
+				script{
+					docker.withRegistry('','DockerHubCredentials'){
+						dockerImage = docker.build("sunleo04/jenkins-devops-microservice:${env.BUILD_TAG}")
+						dockerImage.push();
+						dockerImage.push('latest');
+					}
+					
+				}
+			}
+		}
 	}
 
 	// After build we can have kind of alert to send mail or do some final thing
