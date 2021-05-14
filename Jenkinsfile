@@ -32,6 +32,24 @@ pipeline {
 				sh "mvn clean compile"
 			}
 		}
+
+		stage('SonarQube Quality Check') {
+			environment {
+				SCANNER_HOME = tool 'MySonarQubeScanner'
+				ORGANIZATION = "sunleo"
+				PROJECT_NAME = "jenkins-devops-microservice"
+			}
+			steps {
+				withSonarQubeEnv('MySonarQuebeServer') {
+					sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.organization=$ORGANIZATION \
+					-Dsonar.java.binaries=build/classes/java/ \
+					-Dsonar.projectKey=$PROJECT_NAME \
+					-Dsonar.sources=./src'''
+				}
+			}
+		}
+
+
 		stage('Test') {
 			steps{
 				sh "mvn test"
